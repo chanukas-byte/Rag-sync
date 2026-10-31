@@ -9,7 +9,6 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.162.0",
-    "fastembed>=0.9.1",
     "google-api-python-client>=2.201.0",
     "google-auth>=2.62.0",
     "httpx>=0.28.1",

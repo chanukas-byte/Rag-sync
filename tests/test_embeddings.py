@@ -1,16 +1,29 @@
-import numpy as np
-
 from ragsync import embeddings
 
 
-class FakeModel:
-    def embed(self, texts):
-        return (np.ones(3) for _ in texts)
+class FakeResponse:
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return {"embeddings": [[1.0, 2.0], [3.0, 4.0]]}
 
 
-def test_embed_returns_plain_lists(monkeypatch):
-    monkeypatch.setattr(embeddings, "_model", lambda: FakeModel())
-    assert embeddings.embed(["a", "b"]) == [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
+def test_embed_calls_ollama(monkeypatch):
+    captured = {}
+
+    def fake_post(url, json, timeout):
+        captured["url"] = url
+        captured["json"] = json
+        return FakeResponse()
+
+    monkeypatch.setattr(embeddings.httpx, "post", fake_post)
+
+    result = embeddings.embed(["a", "b"])
+
+    assert result == [[1.0, 2.0], [3.0, 4.0]]
+    assert captured["url"].endswith("/api/embed")
+    assert captured["json"]["input"] == ["a", "b"]
 
 
 def test_embed_empty_input():
