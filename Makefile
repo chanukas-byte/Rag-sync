@@ -19,4 +19,4 @@ run:
 	uv run uvicorn ragsync.api:app --reload
 
 seed:
-	uv run python -m ragsync.ingest
+	uv run python -m ragsync.sync
