@@ -2,7 +2,7 @@ import hashlib
 import os
 
 from ragsync.ingest import build_chunks
-from ragsync.sources.drive import fetch_document, list_documents
+from ragsync.sources.drive import fetch_document, get_document_info, list_documents
 from ragsync.store import (
     get_connection,
     get_document,
@@ -58,6 +58,20 @@ def sync_all(folder_id: str) -> dict:
 
     conn.close()
     return counts
+
+
+def handle_event(event: str, doc_id: str) -> None:
+    conn = get_connection()
+    try:
+        if event == "deleted":
+            mark_deleted(conn, doc_id)
+            result = "deleted"
+        else:
+            doc = get_document_info(doc_id)
+            result = sync_document(conn, doc, fetch_document(doc_id))
+    finally:
+        conn.close()
+    print(f"webhook {event} {doc_id}: {result}")
 
 
 if __name__ == "__main__":

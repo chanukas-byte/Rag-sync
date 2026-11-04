@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+import hmac
+import os
+from typing import Literal
+
+from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-from ragsync import chat
+from ragsync import chat, sync
 
 app = FastAPI(title="rag-sync")
 
@@ -79,6 +83,24 @@ def health() -> dict:
 @app.post("/chat")
 def chat_endpoint(request: ChatRequest) -> dict:
     return chat.answer(request.question)
+
+
+class DocEvent(BaseModel):
+    event: Literal["created", "updated", "deleted"]
+    doc_id: str = Field(min_length=1)
+
+
+@app.post("/webhook/doc-event", status_code=202)
+def doc_event(
+    event: DocEvent,
+    background: BackgroundTasks,
+    x_webhook_secret: str | None = Header(default=None),
+) -> dict:
+    expected = os.environ.get("WEBHOOK_SECRET", "")
+    if not expected or not x_webhook_secret or not hmac.compare_digest(x_webhook_secret, expected):
+        raise HTTPException(status_code=401, detail="invalid secret")
+    background.add_task(sync.handle_event, event.event, event.doc_id)
+    return {"status": "accepted"}
 
 
 @app.get("/", response_class=HTMLResponse)

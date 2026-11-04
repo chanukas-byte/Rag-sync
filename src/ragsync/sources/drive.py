@@ -62,3 +62,19 @@ def fetch_document(doc_id: str, mime_type: str | None = None) -> str:
     else:
         data = files.get_media(fileId=doc_id).execute()
     return data.decode("utf-8")
+
+
+def get_document_info(doc_id: str) -> dict:
+    """Return id, title, url and modified time for one Google Doc."""
+    f = (
+        _service()
+        .files()
+        .get(fileId=doc_id, fields="id, name, webViewLink, modifiedTime")
+        .execute()
+    )
+    return {
+        "id": f["id"],
+        "title": f["name"],
+        "url": f["webViewLink"],
+        "modified_time": f["modifiedTime"],
+    }
