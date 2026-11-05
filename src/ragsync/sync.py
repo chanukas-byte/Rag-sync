@@ -2,6 +2,7 @@ import hashlib
 import os
 
 from ragsync.ingest import build_chunks
+from ragsync.runs import finish_run, record_failed_event, start_run
 from ragsync.sources.drive import fetch_document, get_document_info, list_documents
 from ragsync.store import (
     get_connection,
@@ -69,10 +70,29 @@ def handle_event(event: str, doc_id: str) -> None:
         else:
             doc = get_document_info(doc_id)
             result = sync_document(conn, doc, fetch_document(doc_id))
+    except Exception as exc:
+        conn.rollback()
+        record_failed_event(conn, event, doc_id, repr(exc))
+        print(f"webhook {event} {doc_id}: FAILED {exc!r}")
+        return
     finally:
         conn.close()
     print(f"webhook {event} {doc_id}: {result}")
 
 
+def run_sync(folder_id: str, trigger: str = "manual") -> dict:
+    conn = get_connection()
+    run_id = start_run(conn, trigger)
+    try:
+        counts = sync_all(folder_id)
+    except Exception as exc:
+        finish_run(conn, run_id, None, "failed", repr(exc))
+        conn.close()
+        raise
+    finish_run(conn, run_id, counts, "success")
+    conn.close()
+    return counts
+
+
 if __name__ == "__main__":
-    print(sync_all(os.environ["DRIVE_FOLDER_ID"]))
+    print(run_sync(os.environ["DRIVE_FOLDER_ID"], "manual"))
