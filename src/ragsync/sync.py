@@ -95,4 +95,7 @@ def run_sync(folder_id: str, trigger: str = "manual") -> dict:
 
 
 if __name__ == "__main__":
-    print(run_sync(os.environ["DRIVE_FOLDER_ID"], "manual"))
+    import sys
+
+    trigger = sys.argv[1] if len(sys.argv) > 1 else "manual"
+    print(run_sync(os.environ["DRIVE_FOLDER_ID"], trigger))
