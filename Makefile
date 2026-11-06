@@ -1,4 +1,4 @@
-.PHONY: up down test lint format run seed reconcile
+.PHONY: up down test lint format run seed reconcile evaluate
 
 up:
 	docker compose up -d
@@ -23,3 +23,6 @@ seed:
 
 reconcile:
 	uv run python -m ragsync.sync nightly
+
+evaluate:
+	uv run python -m ragsync.evaluate

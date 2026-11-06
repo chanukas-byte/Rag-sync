@@ -1,0 +1,15 @@
+{"question": "What does ETL stand for?", "expected_doc": "02-etl-vs-elt"}
+{"question": "When is ELT preferred over ETL?", "expected_doc": "02-etl-vs-elt"}
+{"question": "What are the three layers of medallion architecture?", "expected_doc": "04-data-warehouse-vs-data-lake"}
+{"question": "What is the grain of a fact table?", "expected_doc": "06-data-modeling-star-schema"}
+{"question": "Which SCD type keeps history by adding a new row?", "expected_doc": "06-data-modeling-star-schema"}
+{"question": "What does DAG stand for in Airflow?", "expected_doc": "07-apache-airflow-basics"}
+{"question": "What is the command to start Docker Compose services in the background?", "expected_doc": "09-docker-and-containers"}
+{"question": "At what time do nightly pipelines start?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "How many times does each task retry, and how long is the wait?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "After how many consecutive failures is an alert sent?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "How long is raw data kept?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "How many approvals does a pull request need?", "expected_doc": "12-team-handbook-onboarding"}
+{"question": "When does the on-call rota change over?", "expected_doc": "12-team-handbook-onboarding"}
+{"question": "What is the problem with stale knowledge in RAG?", "expected_doc": "13-vector-databases-and-rag"}
+{"question": "What should you do if a secret is committed by mistake?", "expected_doc": "10-git-and-pull-requests"}
