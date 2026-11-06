@@ -2,11 +2,14 @@ import hmac
 import os
 from typing import Literal
 
+import httpx
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from ragsync import chat, sync
+from ragsync.embeddings import OLLAMA_URL
+from ragsync.store import get_connection
 
 app = FastAPI(title="rag-sync")
 
@@ -78,6 +81,34 @@ class ChatRequest(BaseModel):
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/ready")
+def ready():
+    checks = {}
+    last_sync = "never"
+    try:
+        conn = get_connection()
+        try:
+            conn.execute("SELECT 1")
+            row = conn.execute("SELECT status FROM sync_runs ORDER BY id DESC LIMIT 1").fetchone()
+            if row:
+                last_sync = row[0]
+        finally:
+            conn.close()
+        checks["database"] = "ok"
+    except Exception as exc:
+        checks["database"] = f"error: {type(exc).__name__}"
+    try:
+        httpx.get(f"{OLLAMA_URL}/api/tags", timeout=3).raise_for_status()
+        checks["ollama"] = "ok"
+    except Exception as exc:
+        checks["ollama"] = f"error: {type(exc).__name__}"
+    healthy = all(value == "ok" for value in checks.values())
+    return JSONResponse(
+        status_code=200 if healthy else 503,
+        content={"status": "ok" if healthy else "degraded", **checks, "last_sync": last_sync},
+    )
 
 
 @app.post("/chat")
