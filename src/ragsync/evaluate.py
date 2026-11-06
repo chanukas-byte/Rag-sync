@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from ragsync.chat import retrieve
+from ragsync.sources.hybrid import hybrid_retrieve
 
 QUESTIONS_PATH = Path("eval/questions.jsonl")
 K = 5
@@ -28,10 +29,11 @@ def score(ranks: list[int | None]) -> dict:
     return {"questions": total, "hit_rate": hits / total, "mrr": mrr}
 
 
-def evaluate(path: Path = QUESTIONS_PATH, k: int = K) -> dict:
+def evaluate(path: Path = QUESTIONS_PATH, k: int = K, retriever=None) -> dict:
+    retriever = retriever or retrieve
     ranks = []
     for item in load_questions(path):
-        chunks = retrieve(item["question"], k)
+        chunks = retriever(item["question"], k)
         rank = first_rank(chunks, item["expected_doc"])
         ranks.append(rank)
         label = f"rank {rank}" if rank else "MISS"
@@ -45,4 +47,13 @@ def evaluate(path: Path = QUESTIONS_PATH, k: int = K) -> dict:
 
 
 if __name__ == "__main__":
-    evaluate()
+    import sys
+
+    args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
+    path = Path(args[0]) if args else QUESTIONS_PATH
+    if "--hybrid" in sys.argv:
+        print("Mode: hybrid")
+        evaluate(path, retriever=hybrid_retrieve)
+    else:
+        print("Mode: vector only")
+        evaluate(path)
