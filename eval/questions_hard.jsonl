@@ -1,0 +1,15 @@
+{"question": "When do the overnight batch jobs kick off?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "How many attempts does a failing task get before giving up?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "How many back-to-back failures trigger a notification?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "For how long do we retain unprocessed source data?", "expected_doc": "11-team-handbook-pipelines"}
+{"question": "How many reviewers must sign off before code is merged?", "expected_doc": "12-team-handbook-onboarding"}
+{"question": "Who takes over support duty and at what point in the week?", "expected_doc": "12-team-handbook-onboarding"}
+{"question": "Why can an AI assistant give outdated answers?", "expected_doc": "13-vector-databases-and-rag"}
+{"question": "I accidentally pushed a password to the repo, what now?", "expected_doc": "10-git-and-pull-requests"}
+{"question": "What is the difference between a lake and a warehouse?", "expected_doc": "04-data-warehouse-vs-data-lake"}
+{"question": "What is the unit of detail for each row in a fact table?", "expected_doc": "06-data-modeling-star-schema"}
+{"question": "medallion layers", "expected_doc": "04-data-warehouse-vs-data-lake"}
+{"question": "SCD type", "expected_doc": "06-data-modeling-star-schema"}
+{"question": "docker compose up -d", "expected_doc": "09-docker-and-containers"}
+{"question": "on-call rota Monday", "expected_doc": "12-team-handbook-onboarding"}
+{"question": "raw data 90 days", "expected_doc": "11-team-handbook-pipelines"}
