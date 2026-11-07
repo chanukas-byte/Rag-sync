@@ -23,6 +23,13 @@ def retrieve(question: str, k: int = TOP_K) -> list[dict]:
     return [{"title": t, "url": u, "content": c} for t, u, c in rows]
 
 
+def search(question: str, k: int = TOP_K) -> list[dict]:
+    """Hybrid search: vector + keyword, merged."""
+    from ragsync.sources.hybrid import hybrid_retrieve
+
+    return hybrid_retrieve(question, k)
+
+
 def build_prompt(question: str, chunks: list[dict]) -> str:
     context = "\n\n".join(f"[{c['title']}]\n{c['content']}" for c in chunks)
     return (
@@ -36,7 +43,7 @@ def build_prompt(question: str, chunks: list[dict]) -> str:
 
 def answer(question: str) -> dict:
     """Return the model's answer and the documents it was based on."""
-    chunks = retrieve(question)
+    chunks = search(question)
     response = httpx.post(
         f"{OLLAMA_URL}/api/chat",
         json={

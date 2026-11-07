@@ -22,7 +22,7 @@ def test_answer_returns_text_and_unique_sources(monkeypatch):
         {"title": "Doc A", "url": "u1", "content": "x"},
         {"title": "Doc A", "url": "u1", "content": "y"},
     ]
-    monkeypatch.setattr(chat, "retrieve", lambda question, k=5: chunks)
+    monkeypatch.setattr(chat, "search", lambda question, k=5: chunks)
     monkeypatch.setattr(chat.httpx, "post", lambda *args, **kwargs: FakeResponse())
 
     result = chat.answer("How many retries?")
